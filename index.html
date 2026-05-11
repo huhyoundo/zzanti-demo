@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>짠티 듀얼 뷰어 — 의료 학회 시나리오 Mockup</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0a0d12;
+    --panel: #141823;
+    --panel2: #1c2230;
+    --line: #2a3142;
+    --text: #e8eaed;
+    --sub: #9aa0a6;
+    --dim: #6b7280;
+    --teal: #00d4ff;
+    --teal-dim: #0891b2;
+    --lime: #c8ff00;
+    --amber: #fbbf24;
+    --rose: #f87171;
+    --green: #4ade80;
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Pretendard', sans-serif;
+    line-height: 1.6;
+    padding: 24px 16px;
+  }
+  .wrap { max-width: 1280px; margin: 0 auto; }
+
+  /* 헤더 */
+  header.intro {
+    background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(200,255,0,0.04));
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+  }
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .logo {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--teal), var(--teal-dim));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 18px; color: #0a0d12;
+  }
+  h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
+  .tagline { color: var(--sub); font-size: 14px; margin-top: 4px; }
+  .scenario {
+    background: var(--panel);
+    border-left: 3px solid var(--teal);
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--sub);
+    margin-top: 14px;
+  }
+  .scenario b { color: var(--text); }
+
+  /* 짠티 화면 프레임 */
+  .zzanti-frame {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  }
+  .frame-bar {
+    background: var(--panel2);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-bottom: 1px solid var(--line);
+    font-size: 12px;
+  }
+  .frame-dots { display: flex; gap: 6px; }
+  .frame-dots span {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #444;
+  }
+  .frame-dots span:nth-child(1) { background: #ff5f57; }
+  .frame-dots span:nth-child(2) { background: #febc2e; }
+  .frame-dots span:nth-child(3) { background: #28c840; }
+  .url-bar {
+    flex: 1;
+    background: var(--bg);
+    padding: 5px 12px;
+    border-radius: 6px;
+    color: var(--dim);
+    font-family: monospace;
+    font-size: 11px;
+  }
+  .live-pulse {
+    color: var(--rose);
+    font-weight: 700;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .live-pulse::before {
+    content: '';
+    width: 8px; height: 8px;
+    background: var(--rose);
+    border-radius: 50%;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse { 50% { opacity: 0.3; } }
+
+  /* 컨트롤 바 */
+  .control-bar {
+    background: var(--panel2);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+    flex-wrap: wrap;
+  }
+  .control-bar .item {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--sub);
+  }
+  .control-bar .item b { color: var(--text); }
+  .mic-active {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(74,222,128,0.12);
+    color: var(--green);
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-weight: 700;
+  }
+  .mic-active::before {
+    content: '🎤'; font-size: 14px;
+  }
+  .lang-chip {
+    background: rgba(0,212,255,0.12);
+    color: var(--teal);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .latency-badge {
+    background: rgba(74,222,128,0.10);
+    color: var(--green);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 12px;
+    margin-left: auto;
+  }
+
+  /* 듀얼 뷰어 본체 */
+  .dual-viewer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 540px;
+  }
+
+  /* 좌측: 슬라이드 */
+  .slide-panel {
+    background: #fafafa;
+    color: #0a0d12;
+    padding: 40px 36px;
+    position: relative;
+    border-right: 2px solid var(--line);
+  }
+  .slide-page-info {
+    position: absolute;
+    top: 12px; right: 16px;
+    font-size: 11px;
+    color: #666;
+    font-family: monospace;
+  }
+  .slide-format-tag {
+    position: absolute;
+    top: 12px; left: 16px;
+    background: rgba(0,212,255,0.15);
+    color: var(--teal-dim);
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .slide-content {
+    padding: 36px 0 20px;
+  }
+  .slide-eyebrow {
+    color: #0891b2;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    margin-bottom: 12px;
+  }
+  .slide-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: #0a0d12;
+    margin-bottom: 20px;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+  }
+  .slide-bullets {
+    list-style: none;
+    margin-top: 20px;
+  }
+  .slide-bullets li {
+    padding: 8px 0 8px 22px;
+    position: relative;
+    font-size: 14px;
+    color: #333;
+  }
+  .slide-bullets li::before {
+    content: '▸';
+    position: absolute; left: 0;
+    color: #0891b2;
+    font-weight: 800;
+  }
+  .slide-bullets li b { color: #0a0d12; }
+  .slide-chart-mock {
+    margin-top: 20px;
+    padding: 16px;
+    background: #f0f4f8;
+    border-radius: 8px;
+    border-left: 3px solid #0891b2;
+  }
+  .slide-chart-mock .chart-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #555;
+    margin-bottom: 10px;
+  }
+  .bar-row {
+    display: flex; align-items: center;
+    gap: 8px; margin-bottom: 6px;
+    font-size: 11px;
+  }
+  .bar-row .label { width: 80px; color: #444; }
+  .bar-row .bar {
+    height: 14px;
+    background: #0891b2;
+    border-radius: 3px;
+    display: flex; align-items: center;
+    padding: 0 6px;
+    color: white;
+    font-weight: 700;
+    font-size: 10px;
+  }
+
+  /* 우측: 자막 */
+  .caption-panel {
+    background: var(--panel);
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .caption-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 18px;
+  }
+  .caption-header h3 {
+    font-size: 13px;
+    color: var(--sub);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+  .lang-tabs {
+    display: flex; gap: 6px;
+  }
+  .lang-tab {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--bg);
+    color: var(--dim);
+  }
+  .lang-tab.active {
+    background: var(--teal);
+    color: #0a0d12;
+  }
+
+  .caption-stream {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 6px;
+  }
+  .caption-line {
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    background: var(--panel2);
+    border-left: 2px solid var(--line);
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .caption-line.current {
+    background: rgba(0,212,255,0.08);
+    border-left-color: var(--teal);
+    box-shadow: 0 0 0 1px rgba(0,212,255,0.15);
+  }
+  .caption-meta {
+    font-size: 10px;
+    color: var(--dim);
+    margin-bottom: 4px;
+    font-family: monospace;
+    display: flex; justify-content: space-between;
+  }
+  .caption-meta .term-tag {
+    background: rgba(251,191,36,0.18);
+    color: var(--amber);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: 700;
+  }
+  .caption-line.current .text { color: var(--text); font-weight: 500; }
+  .caption-line .text { color: var(--sub); }
+  .caption-line .ko {
+    color: var(--dim);
+    font-size: 12px;
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px dashed var(--line);
+  }
+  .caption-line .ko::before { content: 'KR · '; color: var(--teal); font-weight: 700; }
+
+  .typing-indicator {
+    padding: 10px 14px;
+    background: var(--panel2);
+    border-left: 2px solid var(--green);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--green);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .typing-indicator .dots {
+    display: flex; gap: 3px;
+  }
+  .typing-indicator .dots span {
+    width: 4px; height: 4px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: typing 1.2s ease-in-out infinite;
+  }
+  .typing-indicator .dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-indicator .dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typing { 50% { opacity: 0.3; transform: translateY(-2px); } }
+
+  /* 하단 타임라인 */
+  .timeline-bar {
+    background: var(--panel2);
+    padding: 12px 24px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--sub);
+  }
+  .progress-track {
+    flex: 1;
+    height: 4px;
+    background: var(--line);
+    border-radius: 2px;
+    position: relative;
+  }
+  .progress-fill {
+    width: 38%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), var(--lime));
+    border-radius: 2px;
+  }
+
+  /* 캡션 설명 */
+  .annotation {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 28px;
+  }
+  .anno-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px 22px;
+  }
+  .anno-card .num {
+    color: var(--teal);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    margin-bottom: 8px;
+  }
+  .anno-card h4 {
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  .anno-card p {
+    font-size: 13px;
+    color: var(--sub);
+  }
+  .anno-card b { color: var(--text); }
+
+  /* 비교 표 */
+  .compare {
+    margin-top: 28px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .compare table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .compare th, .compare td {
+    padding: 14px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+  }
+  .compare th {
+    background: var(--panel2);
+    font-weight: 700;
+    color: var(--sub);
+    letter-spacing: 0.05em;
+    font-size: 11px;
+  }
+  .compare th.zzanti-col { color: var(--teal); }
+  .compare td.fail { color: var(--rose); }
+  .compare td.win { color: var(--green); font-weight: 700; }
+  .compare td.dim { color: var(--dim); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- 헤더 -->
+<header class="intro">
+  <div class="brand-row">
+    <div class="logo">Z</div>
+    <div>
+      <h1>짠티 듀얼 뷰어 — 의료 학회 시나리오</h1>
+      <p class="tagline">발표 자료(좌) + 실시간 통역 자막(우) 동시 표시 | 코엑스 의료 학회 가상 데모</p>
+    </div>
+  </div>
+  <div class="scenario">
+    <b>시나리오</b>: 코엑스 한국심장학회 국제 세션 · 발표자 <b>김OO 교수(한국어)</b> · 청중 외국인 의사 · 화면 좌측은 발표자가 업로드한 PPT 그대로, 우측은 짠티가 한국어 음성을 실시간으로 영어 자막으로 변환·표시 (지연 0.8초)
+  </div>
+</header>
+
+<!-- 짠티 듀얼 뷰어 화면 -->
+<div class="zzanti-frame">
+
+  <!-- 브라우저 프레임 -->
+  <div class="frame-bar">
+    <div class="frame-dots"><span></span><span></span><span></span></div>
+    <div class="url-bar">https://zzanti.app/session/kcs-2026-coex-live</div>
+    <div class="live-pulse">LIVE</div>
+  </div>
+
+  <!-- 컨트롤 바 -->
+  <div class="control-bar">
+    <div class="mic-active">발표자 마이크 활성</div>
+    <div class="item"><b>김OO 교수</b> · 한국심장학회</div>
+    <div class="item">입력: <span class="lang-chip">🇰🇷 한국어</span></div>
+    <div class="item">출력: <span class="lang-chip">🇺🇸 English</span></div>
+    <div class="latency-badge">지연 0.82s · 맥락 priming ✓ · 의료용어 매칭 ✓</div>
+  </div>
+
+  <!-- 발표자 정체성 priming 박스 (핵심 차별) -->
+  <div style="background: linear-gradient(90deg, rgba(0,212,255,0.10), rgba(200,255,0,0.04)); border-bottom: 1px solid var(--line); padding: 14px 24px; display: grid; grid-template-columns: auto 1fr auto; gap: 18px; align-items: center;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+      <div style="font-size: 9px; color: var(--teal); font-weight: 800; letter-spacing: 0.14em;">CONTEXT PRIMING</div>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span style="width: 8px; height: 8px; background: var(--green); border-radius: 50%; box-shadow: 0 0 6px var(--green);"></span>
+        <span style="font-size: 11px; font-weight: 700; color: var(--green);">ACTIVE</span>
+      </div>
+    </div>
+    <div style="font-size: 12px; line-height: 1.5;">
+      <div style="color: var(--sub); margin-bottom: 4px;">발표자 정체성을 AI system prompt에 주입 완료</div>
+      <div><b style="color: var(--text);">김OO 교수</b><span style="color: var(--dim);"> · 서울대병원 순환기내과 · 부정맥/심방세동 전공 · 발표주제: AI 12-Lead ECG 분석 · 슬라이드 24장 사전 학습</span></div>
+    </div>
+    <div style="font-size: 10px; color: var(--amber); text-align: right; line-height: 1.5;">
+      <div>"가위" → <b>유전자가위(X)</b> · 일반(X)</div>
+      <div>"AF" → <b style="color: var(--green);">atrial fibrillation ✓</b></div>
+      <div>"조기" → <b style="color: var(--green);">early detection ✓</b></div>
+    </div>
+  </div>
+
+  <!-- 듀얼 뷰어 -->
+  <div class="dual-viewer">
+
+    <!-- 좌측: 슬라이드 -->
+    <div class="slide-panel">
+      <div class="slide-format-tag">PPT · KCS_2026.pptx</div>
+      <div class="slide-page-info">슬라이드 7 / 24</div>
+
+      <div class="slide-content">
+        <div class="slide-eyebrow">SESSION 3 · 인공지능 임상 응용</div>
+        <h2 class="slide-title">심방세동(AF) 조기 진단을 위한<br>AI 12-Lead ECG 분석</h2>
+        <ul class="slide-bullets">
+          <li><b>대상</b> · 서울대병원·삼성서울병원 12,400명 ECG 데이터</li>
+          <li><b>모델</b> · CNN-LSTM Hybrid + Transformer Attention</li>
+          <li><b>비교</b> · 심장내과 전문의 판독 vs AI</li>
+          <li><b>결과</b> · 민감도 94.2% · 특이도 91.7%</li>
+        </ul>
+
+        <div class="slide-chart-mock">
+          <div class="chart-title">진단 정확도 비교 (n=12,400)</div>
+          <div class="bar-row"><span class="label">AI 모델</span><div class="bar" style="width: 78%;">94.2%</div></div>
+          <div class="bar-row"><span class="label">전문의 판독</span><div class="bar" style="width: 75%; background: #6b7280;">89.8%</div></div>
+          <div class="bar-row"><span class="label">기존 알고리즘</span><div class="bar" style="width: 64%; background: #9ca3af;">77.3%</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 우측: 자막 -->
+    <div class="caption-panel">
+      <div class="caption-header">
+        <h3>실시간 통역 자막</h3>
+        <div class="lang-tabs">
+          <span class="lang-tab">KR</span>
+          <span class="lang-tab active">EN</span>
+          <span class="lang-tab">CN</span>
+          <span class="lang-tab">JP</span>
+        </div>
+      </div>
+
+      <div class="caption-stream">
+
+        <div class="caption-line">
+          <div class="caption-meta"><span>14:32:08</span></div>
+          <div class="text">Today, I'd like to introduce our research on early detection of atrial fibrillation using AI-based ECG analysis.</div>
+          <div class="ko">오늘 저희가 발표할 내용은 AI 기반 ECG 분석을 통한 심방세동의 조기 발견에 관한 연구입니다.</div>
+        </div>
+
+        <div class="caption-line">
+          <div class="caption-meta"><span>14:32:24</span><span class="term-tag">의료용어 ✓ 3개 매칭</span></div>
+          <div class="text">As you can see on slide 7, we collected 12-lead ECG data from 12,400 patients at Seoul National University Hospital and Samsung Medical Center.</div>
+          <div class="ko">슬라이드 7번에서 보시는 바와 같이, 서울대병원과 삼성서울병원에서 12,400명 환자의 12유도 심전도 데이터를 수집했습니다.</div>
+        </div>
+
+        <div class="caption-line current">
+          <div class="caption-meta"><span>14:32:41 · NOW</span><span class="term-tag">의료용어 ✓ 5개 매칭</span></div>
+          <div class="text">The model architecture combines CNN-LSTM hybrid with Transformer attention mechanism, which significantly outperformed conventional algorithms in detecting paroxysmal atrial fibrillation.</div>
+          <div class="ko">모델 구조는 CNN-LSTM 하이브리드와 트랜스포머 어텐션 메커니즘을 결합한 것으로, 발작성 심방세동 탐지에서 기존 알고리즘 대비 월등한 성능을 보였습니다.</div>
+        </div>
+
+        <div class="typing-indicator">
+          <span>AI 통역 중</span>
+          <div class="dots"><span></span><span></span><span></span></div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 하단 타임라인 -->
+  <div class="timeline-bar">
+    <span>⏱ 00:18:24 / 00:48:00</span>
+    <div class="progress-track"><div class="progress-fill"></div></div>
+    <span>📑 슬라이드 7/24 자동 동기</span>
+    <span style="color: var(--green); font-weight: 700;">● REC</span>
+  </div>
+
+</div>
+
+<!-- 짠티의 진짜 USP: 맥락 기반 priming 다이어그램 -->
+<div style="margin-top: 28px; background: linear-gradient(135deg, rgba(0,212,255,0.06), transparent); border: 1px solid var(--teal); border-radius: 16px; padding: 32px 36px;">
+  <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px;">
+    <span style="color: var(--teal); font-size: 11px; font-weight: 800; letter-spacing: 0.18em;">★ TRUE USP</span>
+    <h3 style="font-size: 22px; font-weight: 800; letter-spacing: -0.01em;">맥락 기반 통역 (Context-Aware Translation)</h3>
+  </div>
+  <p style="color: var(--sub); font-size: 14px; margin-bottom: 24px;">
+    파파고·DeepL·구글번역은 <b style="color: var(--rose);">사용자가 누구인지 모른 채</b> 번역한다. 짠티는 발표자/사용자의 정체성을 LLM에 사전 주입(priming)해서 <b style="color: var(--teal);">맥락 기반으로 동음이의어·전문 약어를 정확히 해석</b>한다.
+  </p>
+
+  <!-- 다이어그램: 같은 단어, 다른 정체성, 다른 번역 -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+
+    <!-- 가위 예시 -->
+    <div style="background: var(--panel); border-radius: 10px; padding: 22px;">
+      <div style="font-size: 11px; color: var(--dim); font-weight: 700; letter-spacing: 0.12em; margin-bottom: 12px;">EXAMPLE 1 · "가위"</div>
+      <div style="font-size: 28px; font-weight: 800; color: var(--teal); margin-bottom: 16px;">"가위"</div>
+
+      <div style="margin-bottom: 12px;">
+        <div style="font-size: 10px; color: var(--dim); margin-bottom: 4px;">발표자 정체성: 생명공학 교수</div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 11px; color: var(--sub);">→ 짠티:</span>
+          <span style="background: rgba(74,222,128,0.15); color: var(--green); padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 13px;">CRISPR-Cas9 (유전자 가위) ✓</span>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <div style="font-size: 10px; color: var(--dim); margin-bottom: 4px;">발표자 정체성: 일반인</div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 11px; color: var(--sub);">→ 짠티:</span>
+          <span style="background: rgba(74,222,128,0.15); color: var(--green); padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 13px;">scissors ✓</span>
+        </div>
+      </div>
+
+      <div style="border-top: 1px dashed var(--line); padding-top: 12px;">
+        <div style="font-size: 10px; color: var(--dim); margin-bottom: 4px;">파파고·DeepL·구글 (정체성 무지)</div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 11px; color: var(--sub);">→ 일반 모델:</span>
+          <span style="background: rgba(248,113,113,0.15); color: var(--rose); padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 13px;">scissors (디폴트, 오역 빈발)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- AF 예시 -->
+    <div style="background: var(--panel); border-radius: 10px; padding: 22px;">
+      <div style="font-size: 11px; color: var(--dim); font-weight: 700; letter-spacing: 0.12em; margin-bottom: 12px;">EXAMPLE 2 · "AF"</div>
+      <div style="font-size: 28px; font-weight: 800; color: var(--teal); margin-bottom: 16px;">"AF"</div>
+
+      <div style="margin-bottom: 12px;">
+        <div style="font-size: 10px; color: var(--dim); margin-bottom: 4px;">발표자 정체성: 심장내과 전문의</div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 11px; color: var(--sub);">→ 짠티:</span>
+          <span style="background: rgba(74,222,128,0.15); color: var(--green); padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 13px;">atrial fibrillation ✓</span>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <div style="font-size: 10px; color: var(--dim); margin-bottom: 4px;">발표자 정체성: 사진작가/디자이너</div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 11px; color: var(--sub);">→ 짠티:</span>
+          <span style="background: rgba(74,222,128,0.15); color: var(--green); padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 13px;">autofocus ✓</span>
+        </div>
+      </div>
+
+      <div style="border-top: 1px dashed var(--line); padding-top: 12px;">
+        <div style="font-size: 10px; color: var(--dim); margin-bottom: 4px;">파파고·DeepL·구글 (정체성 무지)</div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 11px; color: var(--sub);">→ 일반 모델:</span>
+          <span style="background: rgba(248,113,113,0.15); color: var(--rose); padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 13px;">"AF" 그대로 출력 (해석 불가)</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- priming 흐름 다이어그램 -->
+  <div style="margin-top: 24px; padding: 20px; background: var(--panel); border-radius: 10px;">
+    <div style="font-size: 11px; color: var(--dim); font-weight: 700; letter-spacing: 0.12em; margin-bottom: 14px;">PRIMING FLOW · 4단계</div>
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px;">
+      <div style="background: var(--bg); padding: 10px 14px; border-radius: 8px; border-left: 3px solid var(--teal);">
+        <div style="font-size: 9px; color: var(--dim); margin-bottom: 2px;">STEP 1</div>
+        <b>사용자 프로필 입력</b><br><span style="color: var(--sub); font-size: 11px;">소속·전공·발표주제·슬라이드</span>
+      </div>
+      <span style="color: var(--teal); font-weight: 800;">→</span>
+      <div style="background: var(--bg); padding: 10px 14px; border-radius: 8px; border-left: 3px solid var(--teal);">
+        <div style="font-size: 9px; color: var(--dim); margin-bottom: 2px;">STEP 2</div>
+        <b>System Prompt 주입</b><br><span style="color: var(--sub); font-size: 11px;">"발표자는 ◯◯ 전문의…"</span>
+      </div>
+      <span style="color: var(--teal); font-weight: 800;">→</span>
+      <div style="background: var(--bg); padding: 10px 14px; border-radius: 8px; border-left: 3px solid var(--teal);">
+        <div style="font-size: 9px; color: var(--dim); margin-bottom: 2px;">STEP 3</div>
+        <b>Whisper STT</b><br><span style="color: var(--sub); font-size: 11px;">한국어 음성 인식</span>
+      </div>
+      <span style="color: var(--teal); font-weight: 800;">→</span>
+      <div style="background: var(--bg); padding: 10px 14px; border-radius: 8px; border-left: 3px solid var(--green);">
+        <div style="font-size: 9px; color: var(--dim); margin-bottom: 2px;">STEP 4</div>
+        <b>맥락 기반 번역</b><br><span style="color: var(--green); font-size: 11px;">동음이의어/약어 정확 해석</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 핵심 메커니즘 3장 -->
+<div class="annotation">
+  <div class="anno-card">
+    <div class="num">MECHANISM 01</div>
+    <h4>슬라이드 자동 동기</h4>
+    <p>발표자가 키보드/리모컨으로 슬라이드 넘기면 <b>WebSocket</b>을 통해 모든 청중 디바이스의 좌측 패널이 동시 전환. 청중은 자료 따라잡을 필요 X.</p>
+  </div>
+  <div class="anno-card">
+    <div class="num">MECHANISM 02</div>
+    <h4>의료 용어 2차 검증</h4>
+    <p>Whisper → LLM 번역 → <b>의료 용어 사전 1만 개</b>에서 매칭·치환. "심방세동" → "atrial fibrillation" 정확 변환 (일반 모델 "heart vibration" 오역 방지).</p>
+  </div>
+  <div class="anno-card">
+    <div class="num">MECHANISM 03</div>
+    <h4>다국어 동시 출력</h4>
+    <p>한 번의 한국어 음성 입력을 <b>영·중·일 3개 언어</b>로 병렬 출력. 청중은 본인 디바이스에서 원하는 언어 탭만 선택 (BYOD 지원).</p>
+  </div>
+</div>
+
+<!-- 경쟁 비교 -->
+<div class="compare">
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">기능</th>
+        <th>파파고/구글번역</th>
+        <th>동시통역 부스</th>
+        <th class="zzanti-col">짠티 듀얼 뷰어</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>맥락 기반 priming</b></td>
+        <td class="fail">✗ 정체성 무지</td>
+        <td class="dim">통역사 역량 의존</td>
+        <td class="win">✓ 사용자 정체성 system prompt 주입</td>
+      </tr>
+      <tr>
+        <td><b>동음이의어 정확도</b></td>
+        <td class="fail">디폴트 의미만</td>
+        <td class="dim">통역사 판단</td>
+        <td class="win">✓ "가위/AF/교정" 등 정체성별 정확</td>
+      </tr>
+      <tr>
+        <td><b>슬라이드 표시</b></td>
+        <td class="fail">✗ 없음</td>
+        <td class="dim">청중이 별도 화면</td>
+        <td class="win">✓ 좌측 통합 (PPT/PDF/HTML)</td>
+      </tr>
+      <tr>
+        <td><b>실시간 자막</b></td>
+        <td class="dim">텍스트만</td>
+        <td class="fail">✗ 음성만</td>
+        <td class="win">✓ 우측 동기 + 4개 언어 탭</td>
+      </tr>
+      <tr>
+        <td><b>의료 용어 정확도</b></td>
+        <td class="fail">일반 모델</td>
+        <td class="dim">통역사 역량 의존</td>
+        <td class="win">✓ 의사 검증 사전 매칭</td>
+      </tr>
+      <tr>
+        <td><b>슬라이드·음성 동기</b></td>
+        <td class="fail">✗ 불가능</td>
+        <td class="fail">✗ 수동</td>
+        <td class="win">✓ WebSocket 자동 동기</td>
+      </tr>
+      <tr>
+        <td><b>비용 (1일 학회)</b></td>
+        <td class="dim">₩0 (무료지만 무용)</td>
+        <td class="fail">₩300~600만</td>
+        <td class="win">₩500~1,000만 (자료+통역 일체)</td>
+      </tr>
+      <tr>
+        <td><b>의사 testimonial</b></td>
+        <td class="fail">없음</td>
+        <td class="dim">N/A</td>
+        <td class="win">✓ 사전 확보 (100%)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</div>
+</body>
+</html>
